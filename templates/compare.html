@@ -8,34 +8,41 @@
 
     <title>autoWorth-Comparison</title>
     <link rel="icon" type="image/png" href="https://th.bing.com/th/id/OIP.5U_C8p-VNrI5mhCow1ogjAHaHa?rs=1&pid=ImgDetMain">
+<script>
+  function load_car_model(company_id, model_id) {
+    var companyInput = document.getElementById(company_id);
+    var selectedCompany = companyInput.value.trim();
+    var modelSelect = document.getElementById(model_id);
+    modelSelect.innerHTML = "";
 
-    <script>
-      function load_car_model(company_id, model_id) {
-        var company = document.getElementById(company_id).value;
-        var modelSelect = document.getElementById(model_id);
-        modelSelect.innerHTML = "";
+    // Use the mapping from Flask
+    var companyModels = {{ company_model_map | tojson }};
 
-        var companyModels = {
-          {% for company in companies %}
-            "{{ company }}": [
-              {% for model in car_models %}
-                {% if company in model %}"{{ model }}",
-                {% endif %}
-              {% endfor %}
-            ],
-          {% endfor %}
-        };
+    var validCompanies = Object.keys(companyModels);
 
-        if (companyModels[company]) {
-          companyModels[company].forEach(function(model) {
-            var newOption = document.createElement("option");
-            newOption.value = model;
-            newOption.innerHTML = model;
-            modelSelect.appendChild(newOption);
-          });
-        }
-      }
-    </script>
+    if (!validCompanies.includes(selectedCompany)) {
+      alert("⚠️ Car brand '" + selectedCompany + "' is not available.");
+      companyInput.value = "";
+      return;
+    }
+
+    // Add a default option
+    var defaultOption = document.createElement("option");
+    defaultOption.value = "";
+    defaultOption.innerHTML = "-- Select Model --";
+    modelSelect.appendChild(defaultOption);
+
+    // Populate models
+    companyModels[selectedCompany].forEach(function(model) {
+      var newOption = document.createElement("option");
+      newOption.value = model;
+      newOption.innerHTML = model;
+      modelSelect.appendChild(newOption);
+    });
+  }
+</script>
+
+
   </head>
   <body class="bg-dark">
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">

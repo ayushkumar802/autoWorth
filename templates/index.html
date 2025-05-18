@@ -92,27 +92,42 @@
       </div>
     </div>
 
-    <script>
-      function load_car_model(company_id, car_model_id) {
-        var company = document.getElementById(company_id);
-        var car_model = document.getElementById(car_model_id);
+<script>
+  const companiesList = [
+    {% for c in companies %}
+      "{{ c }}",
+    {% endfor %}
+  ];
 
-        car_model.value = "";
-        car_model.innerHTML = '<option value="">-- Select Model --</option>';
+  function load_car_model(company_id, car_model_id) {
+    var companyInput = document.getElementById(company_id);
+    var selectedCompany = companyInput.value.trim();
 
-        {% for company in companies %}
-          if (company.value == "{{ company }}") {
-            {% for model in car_model %}
-              {% if company in model %}
-                var newOption = document.createElement("option");
-                newOption.value = "{{ model }}";
-                newOption.innerHTML = "{{ model }}";
-                car_model.options.add(newOption);
-              {% endif %}
-            {% endfor %}
-          }
+    var car_model = document.getElementById(car_model_id);
+    car_model.value = "";
+    car_model.innerHTML = '<option value="">-- Select Model --</option>';
+
+
+    if (!companiesList.includes(selectedCompany)) {
+      alert("⚠️ Car brand '" + selectedCompany + "' is not available.");
+      companyInput.value = "";
+      return;  // Stop execution if invalid
+    }
+
+    {% for c in companies %}
+      if (selectedCompany === "{{ c }}") {
+        {% for model in car_model %}
+          {% if c in model %}
+            var newOption = document.createElement("option");
+            newOption.value = "{{ model }}";
+            newOption.innerHTML = "{{ model }}";
+            car_model.options.add(newOption);
+          {% endif %}
         {% endfor %}
       }
+    {% endfor %}
+  }
+
 
       function send_data(event) {
         event.preventDefault(); // Prevent default form submission

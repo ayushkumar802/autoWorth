@@ -16,7 +16,6 @@ def index():
     kms_driven = sorted(df['kms_driven'].unique())
     fuel_type = sorted(df['fuel_type'].unique())
     year = sorted(df['year'].unique(), reverse=True)
-    companies.insert(0,"Select Company")
     fuel_type.insert(0, "Select Type")
     year.insert(0, "Select Year")
 
@@ -40,15 +39,24 @@ def compare():
     car_models = sorted(df['name'].unique())
     fuel_types = sorted(df['fuel_type'].unique())
     years = sorted(df['year'].unique(), reverse=True)
-    companies.insert(0, "Select Company")
+
+    # Map each company to its models
+    company_model_map = {}
+    for company in companies:
+        models = sorted(df[df['company'] == company]['name'].unique())
+        company_model_map[company] = models
+
     fuel_types.insert(0, "Select Type")
     years.insert(0, "Select Year")
 
-    return render_template('compare.html',
-                           companies=companies,
-                           car_models=car_models,
-                           fuel_types=fuel_types,
-                           years=years)
+    return render_template(
+        'compare.html',
+        companies=companies,
+        car_models=car_models,
+        fuel_types=fuel_types,
+        years=years,
+        company_model_map=company_model_map
+    )
 
 @app.route('/compare_result', methods=['POST'])
 def compare_result():
